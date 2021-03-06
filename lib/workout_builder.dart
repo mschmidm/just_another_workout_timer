@@ -48,17 +48,14 @@ class _BuilderPageState extends State<BuilderPage> {
 
   void _duplicateSet(int index) {
     setState(() {
-      _workout.sets.insert(index, Set.fromJson(_workout.sets[index].toJson()));
+      _workout.sets.insert(index, Set.fromJson( _workout.sets[index].toJson()));
       _dirty = true;
     });
   }
 
-  void _duplicateExercise(int setIndex, int exIndex) {
+  void _duplicateExercise(int setIndex, int exIndex){
     setState(() {
-      _workout.sets[setIndex].exercises.insert(
-          exIndex,
-          Exercise.fromJson(
-              _workout.sets[setIndex].exercises[exIndex].toJson()));
+      _workout.sets[setIndex].exercises.insert(exIndex, Exercise.fromJson(_workout.sets[setIndex].exercises[exIndex].toJson()));
       _dirty = true;
     });
   }
@@ -113,9 +110,11 @@ class _BuilderPageState extends State<BuilderPage> {
 
   void _addExercise(int setIndex, bool isRest) {
     setState(() {
-      _workout.sets[setIndex].exercises.add(Exercise(
-          name: isRest ? S.of(context).rest : S.of(context).exercise,
-          duration: 30));
+      _workout.sets[setIndex].exercises.add(
+          Exercise(
+              name: isRest ? S.of(context).rest : S.of(context).exercise,
+              duration: 30
+          ));
       _dirty = true;
     });
   }
@@ -160,9 +159,9 @@ class _BuilderPageState extends State<BuilderPage> {
               ),
               Text(S.of(context).repetitions),
               NumberStepper(
-                  lowerLimit: 1,
+                  lowerLimit: 0,
                   upperLimit: 99,
-                  largeSteps: false,
+                  stepValue: 1,
                   formatNumber: false,
                   value: set.repetitions,
                   valueChanged: (repetitions) {
@@ -200,7 +199,7 @@ class _BuilderPageState extends State<BuilderPage> {
                   IconButton(
                     icon: Icon(Icons.copy),
                     tooltip: S.of(context).duplicate,
-                    onPressed: () => _duplicateSet(index),
+                    onPressed: () =>_duplicateSet(index),
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_upward),
@@ -269,7 +268,9 @@ class _BuilderPageState extends State<BuilderPage> {
                   ),
                   onChanged: (text) {
                     _workout.sets[setIndex].exercises[exIndex].name = text;
-                    _dirty = true;
+                    setState(() {
+                      _dirty = true;
+                    });
                   },
                 )),
             Column(
@@ -277,9 +278,9 @@ class _BuilderPageState extends State<BuilderPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 NumberStepper(
-                  lowerLimit: 1,
-                  upperLimit: 999,
-                  largeSteps: true,
+                  lowerLimit: 0,
+                  upperLimit: 995,
+                  stepValue: 5,
                   formatNumber: true,
                   value: _workout.sets[setIndex].exercises[exIndex].duration,
                   valueChanged: (duration) {
@@ -324,7 +325,7 @@ class _BuilderPageState extends State<BuilderPage> {
                     IconButton(
                       icon: Icon(Icons.copy),
                       tooltip: S.of(context).duplicate,
-                      onPressed: () => _duplicateExercise(setIndex, exIndex),
+                      onPressed: () =>_duplicateExercise(setIndex, exIndex),
                     ),
                   ],
                 )
@@ -337,7 +338,7 @@ class _BuilderPageState extends State<BuilderPage> {
   @override
   Widget build(BuildContext context) => WillPopScope(
         onWillPop: () async {
-          if (!_dirty) {
+          if(!_dirty) {
             return true;
           }
 
