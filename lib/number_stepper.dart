@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 import 'utils.dart';
 
@@ -7,15 +6,16 @@ import 'utils.dart';
 // ignore: must_be_immutable
 class NumberStepper extends StatefulWidget {
   NumberStepper(
-      {@required this.lowerLimit,
-      @required this.upperLimit,
-      @required this.value,
-      @required this.valueChanged,
-      @required this.formatNumber,
-      @required this.largeSteps});
+      {required this.lowerLimit,
+      required this.upperLimit,
+      required this.value,
+      required this.valueChanged,
+      required this.formatNumber,
+      required this.largeSteps});
 
   final int lowerLimit;
   final int upperLimit;
+  final int stepValue;
   final double iconSize = 16;
   int value;
   final ValueChanged<int> valueChanged;

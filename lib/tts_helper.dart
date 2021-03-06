@@ -6,7 +6,7 @@ import 'package:preferences/preference_service.dart';
 // ignore: avoid_classes_with_only_static_members
 /// handles everything related to TTS
 class TTSHelper {
-  static FlutterTts flutterTts;
+  static FlutterTts flutterTts = FlutterTts();
 
   static List<String> languages = List.empty();
 
@@ -20,7 +20,7 @@ class TTSHelper {
 
     useTTS = PrefService.getString('sound') == 'tts' ?? true;
 
-    var ttsLang = PrefService.getString('tts_lang') ?? 'en-US';
+    var ttsLang = PrefService.getString('tts_lang');
     if (ttsLang.endsWith('*')) ttsLang = ttsLang.replaceAll('*', '');
     PrefService.setString('tts_lang', ttsLang);
 

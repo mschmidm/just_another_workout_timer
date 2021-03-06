@@ -11,8 +11,8 @@ class BuilderPage extends StatefulWidget {
   final Workout workout;
   final bool newWorkout;
 
-  BuilderPage({Key key, @required this.workout, @required this.newWorkout})
-      : super(key: key);
+  BuilderPage({required this.workout, required this.newWorkout})
+      : super();
 
   @override
   _BuilderPageState createState() =>
@@ -21,12 +21,12 @@ class BuilderPage extends StatefulWidget {
 
 /// page allowing a user to create a workout
 class _BuilderPageState extends State<BuilderPage> {
-  Workout _workout;
-  String _oldTitle;
-  bool _newWorkout;
+  late Workout _workout;
+  late String _oldTitle;
+  late bool _newWorkout;
   bool _dirty = false;
 
-  _BuilderPageState(Workout workout, {bool newWorkout}) {
+  _BuilderPageState(Workout workout, {required bool newWorkout}) {
     _workout = workout;
     _oldTitle = _workout.title;
     _newWorkout = newWorkout;
@@ -53,7 +53,7 @@ class _BuilderPageState extends State<BuilderPage> {
     });
   }
 
-  void _duplicateExercise(int setIndex, int exIndex){
+  void _duplicateExercise(int setIndex, int exIndex) {
     setState(() {
       _workout.sets[setIndex].exercises.insert(
           exIndex,
@@ -68,7 +68,7 @@ class _BuilderPageState extends State<BuilderPage> {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                content: Text(S.of(context).enterWorkoutName),
+                content: Text(S.of(context)!.enterWorkoutName),
               ));
       return;
     }
@@ -82,16 +82,16 @@ class _BuilderPageState extends State<BuilderPage> {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                content: Text(S.of(context).overwriteExistingWorkout),
+                content: Text(S.of(context)!.overwriteExistingWorkout),
                 actions: <Widget>[
                   FlatButton(
-                    child: Text(S.of(context).no),
+                    child: Text(S.of(context)!.no),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                   ),
                   FlatButton(
-                    child: Text(S.of(context).yes),
+                    child: Text(S.of(context)!.yes),
                     onPressed: () async {
                       await deleteWorkout(_oldTitle);
                       writeWorkout(_workout);
@@ -113,9 +113,11 @@ class _BuilderPageState extends State<BuilderPage> {
 
   void _addExercise(int setIndex, bool isRest) {
     setState(() {
-      _workout.sets[setIndex].exercises.add(Exercise(
-          name: isRest ? S.of(context).rest : S.of(context).exercise,
-          duration: 30));
+      _workout.sets[setIndex].exercises.add(
+          Exercise(
+              name: isRest ? S.of(context)!.rest : S.of(context)!.exercise,
+              duration: 30
+          ));
       _dirty = true;
     });
   }
@@ -132,7 +134,7 @@ class _BuilderPageState extends State<BuilderPage> {
           if (index < _workout.sets.length) {
             return _buildSetItem(_workout.sets[index], index);
           } else {
-            return null;
+            return Container();
           }
         },
       );
@@ -146,23 +148,23 @@ class _BuilderPageState extends State<BuilderPage> {
             children: [
               IconButton(
                   icon: Icon(Icons.delete),
-                  tooltip: S.of(context).deleteSet,
+                  tooltip: S.of(context)!.deleteSet,
                   onPressed: () {
                     _deleteSet(index);
                   }),
               Expanded(
                 child: ListTile(
                   title: Text(
-                    S.of(context).setIndex(_workout.sets.indexOf(set) + 1),
+                    S.of(context)!.setIndex(_workout.sets.indexOf(set) + 1),
                   ),
                   subtitle: Text('${Utils.formatSeconds(set.duration)}'),
                 ),
               ),
-              Text(S.of(context).repetitions),
+              Text(S.of(context)!.repetitions),
               NumberStepper(
-                  lowerLimit: 0,
+                  lowerLimit: 1,
                   upperLimit: 99,
-                  stepValue: 1,
+                  largeSteps: false,
                   formatNumber: false,
                   value: set.repetitions,
                   valueChanged: (repetitions) {
@@ -181,14 +183,14 @@ class _BuilderPageState extends State<BuilderPage> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.fitness_center),
-                    tooltip: S.of(context).addExercise,
+                    tooltip: S.of(context)!.addExercise,
                     onPressed: () {
                       _addExercise(index, false);
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.pause_circle_filled),
-                    tooltip: S.of(context).addRest,
+                    tooltip: S.of(context)!.addRest,
                     onPressed: () {
                       _addExercise(index, true);
                     },
@@ -199,12 +201,12 @@ class _BuilderPageState extends State<BuilderPage> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.copy),
-                    tooltip: S.of(context).duplicate,
+                    tooltip: S.of(context)!.duplicate,
                     onPressed: () =>_duplicateSet(index),
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_upward),
-                    tooltip: S.of(context).moveSetUp,
+                    tooltip: S.of(context)!.moveSetUp,
                     onPressed: index - 1 >= 0
                         ? () {
                             setState(() {
@@ -216,7 +218,7 @@ class _BuilderPageState extends State<BuilderPage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_downward),
-                    tooltip: S.of(context).moveSetDown,
+                    tooltip: S.of(context)!.moveSetDown,
                     onPressed: index + 1 < _workout.sets.length
                         ? () {
                             setState(() {
@@ -240,7 +242,7 @@ class _BuilderPageState extends State<BuilderPage> {
         if (index < _workout.sets[setIndex].exercises.length) {
           return _buildExerciseItem(setIndex, index, set.exercises[index].name);
         } else {
-          return null;
+          return Container();
         }
       });
 
@@ -251,7 +253,7 @@ class _BuilderPageState extends State<BuilderPage> {
           children: [
             IconButton(
               icon: Icon(Icons.delete),
-              tooltip: S.of(context).deleteExercise,
+              tooltip: S.of(context)!.deleteExercise,
               onPressed: () {
                 _deleteExercise(setIndex, exIndex);
               },
@@ -265,13 +267,11 @@ class _BuilderPageState extends State<BuilderPage> {
                   inputFormatters: [LengthLimitingTextInputFormatter(30)],
                   maxLines: 1,
                   decoration: InputDecoration(
-                    labelText: S.of(context).exercise,
+                    labelText: S.of(context)!.exercise,
                   ),
                   onChanged: (text) {
                     _workout.sets[setIndex].exercises[exIndex].name = text;
-                    setState(() {
-                      _dirty = true;
-                    });
+                    _dirty = true;
                   },
                 )),
             Column(
@@ -279,9 +279,9 @@ class _BuilderPageState extends State<BuilderPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 NumberStepper(
-                  lowerLimit: 0,
-                  upperLimit: 995,
-                  stepValue: 5,
+                  lowerLimit: 1,
+                  upperLimit: 999,
+                  largeSteps: true,
                   formatNumber: true,
                   value: _workout.sets[setIndex].exercises[exIndex].duration,
                   valueChanged: (duration) {
@@ -297,7 +297,7 @@ class _BuilderPageState extends State<BuilderPage> {
                     IconButton(
                       icon: Icon(Icons.arrow_upward),
                       padding: EdgeInsets.zero,
-                      tooltip: S.of(context).moveExerciseUp,
+                      tooltip: S.of(context)!.moveExerciseUp,
                       onPressed: exIndex - 1 >= 0
                           ? () {
                               setState(() {
@@ -311,7 +311,7 @@ class _BuilderPageState extends State<BuilderPage> {
                     IconButton(
                       icon: Icon(Icons.arrow_downward),
                       padding: EdgeInsets.zero,
-                      tooltip: S.of(context).moveExerciseDown,
+                      tooltip: S.of(context)!.moveExerciseDown,
                       onPressed:
                           exIndex + 1 < _workout.sets[setIndex].exercises.length
                               ? () {
@@ -325,7 +325,7 @@ class _BuilderPageState extends State<BuilderPage> {
                     ),
                     IconButton(
                       icon: Icon(Icons.copy),
-                      tooltip: S.of(context).duplicate,
+                      tooltip: S.of(context)!.duplicate,
                       onPressed: () =>_duplicateExercise(setIndex, exIndex),
                     ),
                   ],
@@ -339,23 +339,23 @@ class _BuilderPageState extends State<BuilderPage> {
   @override
   Widget build(BuildContext context) => WillPopScope(
         onWillPop: () async {
-          if (!_dirty) {
+          if(!_dirty) {
             return true;
           }
 
           final value = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                    content: Text(S.of(context).exitCheck),
+                    content: Text(S.of(context)!.exitCheck),
                     actions: <Widget>[
                       FlatButton(
-                        child: Text(S.of(context).no),
+                        child: Text(S.of(context)!.no),
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },
                       ),
                       FlatButton(
-                        child: Text(S.of(context).yesExit),
+                        child: Text(S.of(context)!.yesExit),
                         onPressed: () {
                           Navigator.of(context).pop(true);
                         },
@@ -363,14 +363,13 @@ class _BuilderPageState extends State<BuilderPage> {
                     ],
                   ));
 
-          return value;
+          return value == true;
         },
         child: Scaffold(
           appBar: AppBar(
             title: TextFormField(
                 initialValue: _workout.title,
                 maxLength: 30,
-                maxLengthEnforced: true,
                 inputFormatters: [LengthLimitingTextInputFormatter(30)],
                 maxLines: 1,
                 onChanged: (name) {
@@ -380,12 +379,12 @@ class _BuilderPageState extends State<BuilderPage> {
                   });
                 },
                 decoration: InputDecoration(
-                  labelText: S.of(context).name,
+                  labelText: S.of(context)!.name,
                 )),
             actions: [
               IconButton(
                 icon: const Icon(Icons.save),
-                tooltip: S.of(context).saveWorkout,
+                tooltip: S.of(context)!.saveWorkout,
                 onPressed: saveWorkout,
               )
             ],
@@ -396,7 +395,7 @@ class _BuilderPageState extends State<BuilderPage> {
           floatingActionButton: FloatingActionButton(
             heroTag: 'mainFAB',
             onPressed: _addSet,
-            tooltip: S.of(context).addSet,
+            tooltip: S.of(context)!.addSet,
             child: Icon(Icons.add),
           ),
           floatingActionButtonLocation:
