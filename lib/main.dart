@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:preferences/preference_service.dart';
 
 import 'generated/l10n.dart';
@@ -10,13 +11,15 @@ import 'tts_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GestureBinding.instance.resamplingEnabled = true;
+  GestureBinding.instance!.resamplingEnabled = true;
   PrefService.init(prefix: 'pref_')
       .then((value) => PrefService.setDefaultValues({
             'wakelock': true,
             'halftime': false,
             'ticks': false,
-            'tts_next_announce': true
+            'tts_next_announce': true,
+            'sound': 'tts',
+            'tts_lang': 'en-US'
           }))
       .then((value) => Future.wait([TTSHelper.init(), SoundHelper.loadSounds()])
           .then((value) => runApp(JAWTApp())));
@@ -47,7 +50,7 @@ class JAWTApp extends StatelessWidget {
             if (supportedLocales.contains(locale)) return locale;
           }
 
-          for (var locale in locales) {
+          for (var locale in locales!) {
             if (supportedLocales.contains(locale)) {
               PrefService.setString('lang', locale.languageCode);
               return locale;

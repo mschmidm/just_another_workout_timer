@@ -5,7 +5,11 @@ import 'package:path_provider/path_provider.dart';
 import 'workout.dart';
 
 Future<String> get _localPath async {
-  final directory = await getExternalStorageDirectory();
+  var directory = await getExternalStorageDirectory();
+
+  if (directory == null) {
+    directory = await getApplicationDocumentsDirectory();
+  }
 
   await Directory('${directory.path}/workouts').create();
 
@@ -28,7 +32,7 @@ Future<bool> workoutExists(String title) async {
   return await file.exists();
 }
 
-Future<Workout> loadWorkout(String title) async {
+Future<Workout?> loadWorkout(String title) async {
   try {
     final file = await _loadWorkoutFile(title);
 
@@ -40,7 +44,7 @@ Future<Workout> loadWorkout(String title) async {
   }
 }
 
-void deleteWorkout(String title) async {
+Future<void> deleteWorkout(String title) async {
   try {
     final file = await _loadWorkoutFile(title);
     file.delete();
@@ -55,5 +59,6 @@ Future<List<Workout>> getAllWorkouts() async {
       .listSync()
       .map((e) => e.path.split("/").last.split(".").first)
       .toList();
-  return await Future.wait(titles.map((t) async => await loadWorkout(t)));
+  // ignore: unnecessary_null_comparison
+  return await Future.wait(titles.map((t) async => loadWorkout(t)).cast());
 }

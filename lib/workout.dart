@@ -2,8 +2,8 @@ import 'dart:convert';
 
 class Workout {
   Workout({
-    this.title,
-    this.sets,
+    required this.title,
+    required this.sets,
   });
 
   Workout.empty() {
@@ -13,8 +13,8 @@ class Workout {
     ];
   }
 
-  String title;
-  List<Set> sets;
+  late String title;
+  late List<Set> sets;
 
   int get duration {
     var duration = 0;
@@ -30,7 +30,7 @@ class Workout {
   }
 
   /// move a set up or down the order
-  void moveSet(int index, {bool moveUp}) {
+  void moveSet(int index, {required bool moveUp}) {
     var sets = this.sets.toList();
     if (!moveUp && index + 1 < this.sets.length) {
       var a = sets[index];
@@ -63,8 +63,8 @@ class Workout {
 
 class Set {
   Set({
-    this.repetitions,
-    this.exercises,
+    required this.repetitions,
+    required this.exercises,
   });
 
   Set.empty() {
@@ -84,7 +84,7 @@ class Set {
   }
 
   /// move an exercise up or down the order
-  void moveExercise(int index, {bool moveUp}) {
+  void moveExercise(int index, {required bool moveUp}) {
     var sets = exercises.toList();
     if (!moveUp && index + 1 < exercises.length) {
       var a = sets[index];
@@ -118,8 +118,8 @@ class Set {
 
 class Exercise {
   Exercise({
-    this.name,
-    this.duration,
+    required this.name,
+    required this.duration,
   });
 
   String name;

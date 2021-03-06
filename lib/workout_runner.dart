@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:preferences/preference_service.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -17,28 +16,28 @@ import 'workout.dart';
 class WorkoutPage extends StatefulWidget {
   final Workout workout;
 
-  WorkoutPage({Key key, @required this.workout}) : super(key: key);
+  WorkoutPage({required this.workout}) : super();
 
   @override
   _WorkoutPageState createState() => _WorkoutPageState(workout);
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-  Timer _timer;
-  Workout _workout;
+  Timer? _timer;
+  late Workout _workout;
 
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
 
-  Set _currentSet;
-  Exercise _currentExercise;
+  Set? _currentSet;
+  Exercise? _currentExercise;
   int _currentReps = 0;
 
-  Set _nextSet;
+  Set? _nextSet;
 
-  Exercise _prevExercise;
-  Exercise _nextExercise;
+  Exercise? _prevExercise;
+  Exercise? _nextExercise;
 
   int _remainingSeconds = 10;
   int _currentSecond = 0;
@@ -76,8 +75,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
   void skipBackward() {
     if (_prevExercise != null) {
       setState(() {
-        _currentSecond -= (_currentExercise.duration - _remainingSeconds) +
-            _prevExercise.duration +
+        _currentSecond -= (_currentExercise!.duration - _remainingSeconds) +
+            _prevExercise!.duration +
             1;
       });
       _timerStop();
@@ -102,7 +101,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     // announce first exercise
     _timetable[1] = () {
       TTSHelper.speak(
-          S.of(context).firstExercise(_workout.sets[0].exercises[0].name));
+          S.of(context)!.firstExercise(_workout.sets[0].exercises[0].name));
     };
 
     // countdown to workout start
@@ -126,9 +125,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
       for (var rep = 0; rep < set.repetitions; rep++) {
         set.exercises.asMap().forEach((exIndex, exercise) {
-          Set _locNextSet;
-          Exercise _locNextExercise;
-          Exercise _locPrevExercise;
+          Set? _locNextSet;
+          Exercise? _locNextExercise;
+          Exercise? _locPrevExercise;
 
           // case: exercise is somewhere in set
           if (exIndex + 1 < set.exercises.length) {
@@ -170,7 +169,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               exercise.duration >= 10) {
             setMap[_currentTime + exercise.duration - 9] = () {
               TTSHelper.speak(
-                  S.of(context).nextExercise(_locNextExercise.name));
+                  S.of(context)!.nextExercise(_locNextExercise!.name));
             };
           } else if (_currentSecond > 10 && PrefService.getBool('ticks')) {
             SoundHelper.playBeepTick();
@@ -186,7 +185,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               if (PrefService.getString('sound') == 'beep') {
                 SoundHelper.playDouble();
               } else if (PrefService.getString('sound') == 'tts') {
-                TTSHelper.speak(S.of(context).halfwayDone);
+                TTSHelper.speak(S.of(context)!.halfwayDone);
               }
             };
           }
@@ -233,11 +232,11 @@ class _WorkoutPageState extends State<WorkoutPage> {
       // announce completed workout
       _timetable[_currentTime] = () {
         _timerStop();
-        TTSHelper.speak(S.of(context).workoutComplete);
+        TTSHelper.speak(S.of(context)!.workoutComplete);
         setState(() {
           _workoutDone = true;
           _currentExercise =
-              Exercise(name: S.of(context).workoutComplete, duration: 1);
+              Exercise(name: S.of(context)!.workoutComplete, duration: 1);
         });
       };
 
@@ -259,7 +258,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       _remainingSeconds -= 1;
 
       if (_timetable.containsKey(_currentSecond)) {
-        _timetable[_currentSecond]();
+        _timetable[_currentSecond]!();
       } else if (_currentSecond > 10 && PrefService.getBool('ticks')) {
         SoundHelper.playBeepTick();
       }
@@ -268,7 +267,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   void _timerStop() {
     setState(() {
-      _timer.cancel();
+      _timer!.cancel();
     });
   }
 
@@ -294,7 +293,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     buildTimetable();
   }
 
-  Widget _buildCurrentSetList(Set set) {
+  Widget _buildCurrentSetList(Set? set) {
     if (set == null) return Container();
 
     return SizedBox(
@@ -303,9 +302,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
         itemBuilder: (context, index) {
           if (index < set.exercises.length) {
             return _buildSetItem(set.exercises[index],
-                set.exercises.indexOf(_currentExercise) == index);
+                set.exercises.indexOf(_currentExercise!) == index);
           } else {
-            return null;
+            return Container();
           }
         },
         itemCount: set.exercises.length,
@@ -315,7 +314,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     );
   }
 
-  Widget _buildNextSetList(Set set) {
+  Widget _buildNextSetList(Set? set) {
     if (set == null) return Container();
 
     return SizedBox(
@@ -324,9 +323,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
         itemBuilder: (context, index) {
           if (index < set.exercises.length) {
             return _buildSetItem(set.exercises[index],
-                set.exercises.indexOf(_currentExercise) == index);
+                set.exercises.indexOf(_currentExercise!) == index);
           } else {
-            return null;
+            return Container();
           }
         },
         itemCount: set.exercises.length,
@@ -342,7 +341,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             : Theme.of(context).focusColor,
         title: Text(exercise.name),
         subtitle: Text(S
-            .of(context)
+            .of(context)!
             .durationWithTime(Utils.formatSeconds(exercise.duration))),
       );
 
@@ -365,25 +364,25 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 // left side of footer
                 Expanded(
                     child: ListTile(
-                  title: Text(S.of(context).exerciseOf(
-                      _currentSet.exercises.indexOf(_currentExercise) +
+                  title: Text(S.of(context)!.exerciseOf(
+                      _currentSet!.exercises.indexOf(_currentExercise!) +
                           1 +
-                          (_currentReps * _currentSet.exercises.length),
-                      _currentSet.exercises.length * _currentSet.repetitions)),
+                          (_currentReps * _currentSet!.exercises.length),
+                      _currentSet!.exercises.length * _currentSet!.repetitions)),
                   subtitle: Text(S
-                      .of(context)
-                      .repOf(_currentReps + 1, _currentSet.repetitions)),
+                      .of(context)!
+                      .repOf(_currentReps + 1, _currentSet!.repetitions)),
                 )),
                 // right side of footer
                 Expanded(
                     child: ListTile(
                   title: Text(
-                    S.of(context).setOf(_workout.sets.indexOf(_currentSet) + 1,
+                    S.of(context)!.setOf(_workout.sets.indexOf(_currentSet!) + 1,
                         _workout.sets.length),
                     textAlign: TextAlign.end,
                   ),
                   subtitle: Text(
-                    S.of(context).durationLeft(
+                    S.of(context)!.durationLeft(
                         Utils.formatSeconds(
                             _workout.duration - _currentSecond + 10),
                         Utils.formatSeconds(_workout.duration + 10)),
@@ -400,7 +399,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 child: Column(
                   children: [
                     Text(
-                      '${S.of(context).setIndex(_workout.sets.indexOf(_currentSet) + 1)} - ${Utils.formatSeconds(_remainingSeconds)}',
+                      '${S.of(context)!.setIndex(_workout.sets.indexOf(_currentSet!) + 1)} - ${Utils.formatSeconds(_remainingSeconds)}',
                       style:
                           TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                     ),
@@ -408,13 +407,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       value: _remainingSeconds /
                           (_currentSecond < 10
                               ? 10
-                              : _currentExercise.duration),
+                              : _currentExercise!.duration),
                       minHeight: 6,
                       valueColor: AlwaysStoppedAnimation<Color>(
                           Theme.of(context).accentColor),
                     ),
                     Text(
-                      '${_currentExercise.name}',
+                      '${_currentExercise!.name}',
                       style:
                           TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
@@ -433,7 +432,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       children: [
                         Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Text(S.of(context).currentSet,
+                          child: Text(S.of(context)!.currentSet,
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
@@ -448,17 +447,17 @@ class _WorkoutPageState extends State<WorkoutPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ListTile(
-                                title: Text(S.of(context).nextSet,
+                                title: Text(S.of(context)!.nextSet,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
                                 subtitle: _nextSet != null
                                     ? Text(S
-                                        .of(context)
-                                        .countRepetitions(_nextSet.repetitions))
+                                        .of(context)!
+                                        .countRepetitions(_nextSet!.repetitions))
                                     : null,
                               ),
-                              _buildNextSetList(_nextSet),
+                              _buildNextSetList(_nextSet!),
                             ],
                           ),
                         )
@@ -474,15 +473,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
             FloatingActionButton(
               heroTag: 'FAB1',
               mini: true,
-              onPressed: () {
-                skipBackward();
-              },
+              onPressed: skipBackward,
               child: Icon(Icons.skip_previous),
             ),
             FloatingActionButton(
               heroTag: 'mainFAB',
               child: Icon(
-                _timer != null && _timer.isActive
+                _timer != null && _timer!.isActive
                     ? Icons.pause
                     : _workoutDone
                         ? Icons.replay
@@ -490,7 +487,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 size: 32,
               ),
               onPressed: () {
-                if (_timer != null && _timer.isActive) {
+                if (_timer != null && _timer!.isActive) {
                   _timerStop();
                 } else if (_workoutDone) {
                   _resetWorkout();
@@ -502,9 +499,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             FloatingActionButton(
               heroTag: 'FAB2',
               mini: true,
-              onPressed: () {
-                skipForward();
-              },
+              onPressed: skipForward,
               child: Icon(Icons.skip_next),
             )
           ],
@@ -520,16 +515,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
         final value = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-                  content: Text(S.of(context).exitCheck),
+                  content: Text(S.of(context)!.exitCheck),
                   actions: <Widget>[
                     FlatButton(
-                      child: Text(S.of(context).no),
+                      child: Text(S.of(context)!.no),
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       },
                     ),
                     FlatButton(
-                      child: Text(S.of(context).yesExit),
+                      child: Text(S.of(context)!.yesExit),
                       onPressed: () {
                         Navigator.of(context).pop(true);
                       },
