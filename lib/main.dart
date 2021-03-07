@@ -13,7 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GestureBinding.instance!.resamplingEnabled = true;
   PrefService.init(prefix: 'pref_')
-      .then((value) => PrefService.setDefaultValues({
+      .then((_) => PrefService.setDefaultValues({
             'wakelock': true,
             'halftime': false,
             'ticks': false,
@@ -21,8 +21,8 @@ void main() async {
             'sound': 'tts',
             'tts_lang': 'en-US'
           }))
-      .then((value) => Future.wait([TTSHelper.init(), SoundHelper.loadSounds()])
-          .then((value) => runApp(JAWTApp())));
+      .then((_) => Future.wait([TTSHelper.init(), SoundHelper.loadSounds()])
+          .then((_) => runApp(JAWTApp())));
 }
 
 class JAWTApp extends StatelessWidget {
