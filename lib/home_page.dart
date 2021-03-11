@@ -82,13 +82,13 @@ class _HomePageState extends State<HomePage> {
   _showDeleteDialog(BuildContext context, Workout workout) {
     // set up the buttons
     Widget cancelButton = FlatButton(
-      child: Text(S.of(context)!.cancel),
+      child: Text(S.of(context).cancel),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
     Widget continueButton = FlatButton(
-      child: Text(S.of(context)!.delete),
+      child: Text(S.of(context).delete),
       onPressed: () {
         deleteWorkout(workout.title);
         _loadWorkouts();
@@ -97,8 +97,8 @@ class _HomePageState extends State<HomePage> {
     );
     // set up the AlertDialog
     var alert = AlertDialog(
-      title: Text(S.of(context)!.delete),
-      content: Text(S.of(context)!.deleteConfirmation(workout.title)),
+      title: Text(S.of(context).delete),
+      content: Text(S.of(context).deleteConfirmation(workout.title)),
       actions: [
         cancelButton,
         continueButton,
@@ -128,13 +128,13 @@ class _HomePageState extends State<HomePage> {
             child: ListTile(
               title: Text(workout.title),
               subtitle: Text(S
-                  .of(context)!
+                  .of(context)
                   .durationWithTime(Utils.formatSeconds(workout.duration))),
             ),
           ),
           IconButton(
             icon: Icon(Icons.edit),
-            tooltip: S.of(context)!.editWorkout,
+            tooltip: S.of(context).editWorkout,
             onPressed: () {
               Navigator.push(
                 context,
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
               icon: Icon(Icons.play_circle_fill),
-              tooltip: S.of(context)!.startWorkout,
+              tooltip: S.of(context).startWorkout,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
               }),
           IconButton(
               icon: Icon(Icons.delete),
-              tooltip: S.of(context)!.deleteWorkout,
+              tooltip: S.of(context).deleteWorkout,
               onPressed: () {
                 _showDeleteDialog(context, workout);
               })
@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(S.of(context)!.title),
+          title: Text(S.of(context).title),
           actions: [
             IconButton(
                 icon: Icon(_sortIcon),
@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ).then((value) => _loadWorkouts());
           },
-          tooltip: S.of(context)!.addWorkout,
+          tooltip: S.of(context).addWorkout,
           child: Icon(Icons.add),
         ),
       );

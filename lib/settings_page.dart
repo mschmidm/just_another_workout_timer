@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:preferences/dropdown_preference.dart';
-import 'package:preferences/preference_page.dart';
-import 'package:preferences/preference_title.dart';
-import 'package:preferences/preferences.dart';
+import 'package:pref/pref.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'generated/l10n.dart';
@@ -32,125 +29,139 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadLicense();
     return Scaffold(
         appBar: AppBar(
-          title: Text(S.of(context)!.settings),
+          title: Text(S.of(context).settings),
         ),
-        body: PreferencePage([
-          PreferenceTitle(S.of(context)!.general),
-          DropdownPreference(
-            S.of(context)!.language,
-            'lang',
-            defaultVal: 'en',
-            values: ['en', 'de'],
-            displayValues: [S.of(context)!.english, S.of(context)!.german],
-            onChange: (value) {
-              setState(() {
-                S.load(Locale(value));
-              });
-            },
-          ),
-          SwitchPreference(
-            S.of(context)!.keepScreenAwake,
-            'wakelock',
-          ),
-          SwitchPreference(S.of(context)!.settingHalfway, 'halftime'),
-          SwitchPreference(S.of(context)!.playTickEverySecond, 'ticks'),
-          PreferenceTitle(S.of(context)!.soundOutput),
-          RadioPreference(
-            S.of(context)!.noSound,
-            'none',
-            'sound',
-            desc: S.of(context)!.noSoundDesc,
-            onSelect: () {
-              TTSHelper.useTTS = false;
-              SoundHelper.useSound = false;
-            },
-          ),
-          RadioPreference(
-            S.of(context)!.useTTS,
-            'tts',
-            'sound',
-            desc: S.of(context)!.useTTSDesc,
-            isDefault: true,
-            disabled: !TTSHelper.available,
-            onSelect: () {
-              TTSHelper.useTTS = true;
-              SoundHelper.useSound = false;
-            },
-          ),
-          RadioPreference(
-            S.of(context)!.useSound,
-            'beep',
-            'sound',
-            desc: S.of(context)!.useSoundDesc,
-            onSelect: () {
-              TTSHelper.useTTS = false;
-              SoundHelper.useSound = true;
-            },
-          ),
-          PreferenceTitle(S.of(context)!.tts),
-          DropdownPreference(
-            S.of(context)!.ttsLang,
-            'tts_lang',
-            desc: S.of(context)!.ttsLangDesc,
-            defaultVal: (TTSHelper.languages.isNotEmpty
-                ? TTSHelper.languages.first
-                : ''),
-            values: TTSHelper.languages,
-            disabled: !TTSHelper.available,
-            onChange: (value) {
-              TTSHelper.flutterTts.setLanguage(value);
-            },
-          ),
-          SwitchPreference(
-            S.of(context)!.announceUpcomingExercise,
-            'tts_next_announce',
-            desc: S.of(context)!.AnnounceUpcomingExerciseDesc,
-            disabled: !TTSHelper.available,
-          ),
-          PreferenceTitle(S.of(context)!.licenses),
-          PreferenceText(
-            S.of(context)!.viewOnGithub,
-            subtitle: Text(S.of(context)!.reportIssuesOrRequestAFeature),
-            onTap: () {
-              launch(
-                  'https://github.com/blockbasti/just_another_workout_timer');
-            },
-          ),
-          PreferenceText(
-            S.of(context)!.viewLicense,
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => Dialog(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Text(
-                                S.of(context)!.title,
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+        body: PrefPage(
+          children: [
+            PrefTitle(
+              title: Text(S.of(context).general),
+            ),
+            PrefDropdown(
+              title: Text(S.of(context).language),
+              items: [
+                DropdownMenuItem(
+                    child: Text(S.of(context).english), value: 'en'),
+                DropdownMenuItem(child: Text(S.of(context).german), value: 'de')
+              ],
+              onChange: (value) {
+                setState(() {
+                  S.load(Locale(value.toString()));
+                });
+              },
+              pref: 'lang',
+            ),
+            PrefSwitch(
+              title: Text(S.of(context).keepScreenAwake),
+              pref: 'wakelock',
+            ),
+            PrefSwitch(
+                title: Text(S.of(context).settingHalfway), pref: 'halftime'),
+            PrefSwitch(
+                title: Text(S.of(context).playTickEverySecond), pref: 'ticks'),
+            PrefTitle(
+              title: Text(S.of(context).soundOutput),
+            ),
+            PrefRadio(
+              title: Text(S.of(context).noSound),
+              value: 'none',
+              pref: 'sound',
+              //desc: S.of(context).noSoundDesc,
+              onSelect: () {
+                TTSHelper.useTTS = false;
+                SoundHelper.useSound = false;
+              },
+            ),
+            PrefRadio(
+              title: Text(S.of(context).useTTS),
+              value: 'tts',
+              pref: 'sound',
+              //desc: S.of(context).useTTSDesc,
+              disabled: !TTSHelper.available,
+              onSelect: () {
+                TTSHelper.useTTS = true;
+                SoundHelper.useSound = false;
+              },
+            ),
+            PrefRadio(
+              title: Text(S.of(context).useSound),
+              value: 'beep',
+              pref: 'sound',
+              //desc: S.of(context).useSoundDesc,
+              onSelect: () {
+                TTSHelper.useTTS = false;
+                SoundHelper.useSound = true;
+              },
+            ),
+            PrefTitle(
+              title: Text(S.of(context).tts),
+            ),
+            PrefDropdown(
+              title: Text(S.of(context).ttsLang),
+              pref: 'tts_lang',
+              //desc: S.of(context).ttsLangDesc,
+              items: TTSHelper.languages
+                  .map((e) => DropdownMenuItem(
+                      child: Text(e.toString()), value: e.toString()))
+                  .toList(),
+              disabled: !TTSHelper.available,
+              onChange: (value) {
+                TTSHelper.flutterTts.setLanguage(value.toString());
+              },
+            ),
+            PrefSwitch(
+              title: Text(S.of(context).announceUpcomingExercise),
+              pref: 'tts_next_announce',
+              //desc: S.of(context).AnnounceUpcomingExerciseDesc,
+              disabled: !TTSHelper.available,
+            ),
+            PrefTitle(
+              title: Text(S.of(context).licenses),
+            ),
+            PrefButton(
+              child: Text(S.of(context).viewOnGithub),
+              subtitle: Text(S.of(context).reportIssuesOrRequestAFeature),
+              onTap: () {
+                launch(
+                    'https://github.com/blockbasti/just_another_workout_timer');
+              },
+            ),
+            PrefButton(
+              child: Text(S.of(context).viewLicense),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  S.of(context).title,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Text(_license),
-                            )
-                          ],
-                        ),
-                      ));
-            },
-          ),
-          PreferenceText(
-            S.of(context)!.viewOSSLicenses,
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OssLicensesPage(),
-                  ));
-            },
-          )
-        ]));
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(_license),
+                              )
+                            ],
+                          ),
+                        ));
+              },
+            ),
+            PrefButton(
+              child: Text(S.of(context).viewOSSLicenses),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OssLicensesPage(),
+                    ));
+              },
+            )
+          ],
+        ));
   }
 }

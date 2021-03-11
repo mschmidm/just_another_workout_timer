@@ -15,7 +15,6 @@ class NumberStepper extends StatefulWidget {
 
   final int lowerLimit;
   final int upperLimit;
-  final int stepValue;
   final double iconSize = 16;
   int value;
   final ValueChanged<int> valueChanged;

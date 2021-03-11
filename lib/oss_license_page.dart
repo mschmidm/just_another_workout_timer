@@ -49,7 +49,7 @@ class OssLicensesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: Text(S.of(context)!.ossLicenses),
+        title: Text(S.of(context).ossLicenses),
       ),
       body: FutureBuilder<List<String>>(
           future: _licenses,

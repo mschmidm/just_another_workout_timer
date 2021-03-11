@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:preferences/preference_service.dart';
+import 'package:pref/pref.dart';
 
 // ignore: avoid_classes_with_only_static_members
 /// handles everything related to TTS
@@ -15,14 +16,14 @@ class TTSHelper {
   /// enable/disable TTS output
   static bool useTTS = true;
 
-  static Future<void> init() async {
+  static Future<void> init(BuildContext context) async {
     flutterTts = FlutterTts();
 
-    useTTS = PrefService.getString('sound') == 'tts' ?? true;
+    useTTS = PrefService.of(context).get('sound') == 'tts';
 
-    var ttsLang = PrefService.getString('tts_lang');
+    var ttsLang = PrefService.of(context).get('tts_lang');
     if (ttsLang.endsWith('*')) ttsLang = ttsLang.replaceAll('*', '');
-    PrefService.setString('tts_lang', ttsLang);
+    PrefService.of(context).set('tts_lang', ttsLang);
 
     try {
       await flutterTts
@@ -42,7 +43,7 @@ class TTSHelper {
     } on TimeoutException {
       available = false;
       useTTS = false;
-      PrefService.setString('sound', 'beep');
+      PrefService.of(context).set('sound', 'beep');
       return;
     }
   }
